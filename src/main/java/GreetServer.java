@@ -22,7 +22,6 @@ public class GreetServer {
                 Reads a line of text
 
              */
-
             clientSocket = serverSocket.accept();
 //            while (true) {
 //                clientSocket = serverSocket.accept();
