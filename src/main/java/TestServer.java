@@ -77,8 +77,11 @@ public class TestServer implements Runnable {
 //                }
             }
 
-        } catch(IOException e) {
-            e.printStackTrace();
+        }
+        catch (IOException e) {
+            System.out.println("Exception caught when trying to listen on port "
+                    + portNumber + " or listening for a connection");
+            System.out.println(e.getMessage());
         }
     }
 
