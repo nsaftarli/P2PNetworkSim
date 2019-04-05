@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.PrintWriter;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -10,6 +11,7 @@ import java.net.Socket;
  */
 public abstract class Server {
     protected ServerSocket serverSocket;
+    protected DatagramSocket datagramSocket;
     protected Socket clientSocket;
     protected PrintWriter out;
     protected BufferedReader in;
