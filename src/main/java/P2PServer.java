@@ -6,9 +6,13 @@ public class P2PServer extends Server {
     public P2PServer(){
         super();
     }
+    public P2PServer(int id) {
+        super(id);
+    }
 
-    public void start(int port) {}
+    private Thread thread = null;
+
+    public void start() {}
     public void stop(){}
 
-    public static void main(String[] args) {}
 }

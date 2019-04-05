@@ -34,9 +34,9 @@ public class P2PClient {
 
     }
 
-    public int getServerID(String val){
-
-    }
+//    public int getServerID(String val){
+//
+//    }
 
     public String getServerIP(int id) {
         return directoryHashMap.get(id);

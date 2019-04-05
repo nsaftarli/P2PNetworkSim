@@ -12,9 +12,9 @@ public class Main {
         client.startConnection(ipAddress, portNumber);
         String serverResponse = client.sendMessage("hello");
         System.out.println(serverResponse);
-//        client.stopConnection();
+        client.stopConnection();
 
-//        client.startConnection(ipAddress, portNumber);
+        client.startConnection(ipAddress, portNumber);
         serverResponse = client.sendMessage("hi");
         System.out.println(serverResponse);
         client.stopConnection();

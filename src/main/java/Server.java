@@ -9,22 +9,33 @@ import java.net.Socket;
  * Overall though, all servers should have the following.
  */
 public abstract class Server {
-    private ServerSocket serverSocket;
-    private Socket clientSocket;
-    private PrintWriter out;
-    private BufferedReader in;
-    private int id;
+    protected ServerSocket serverSocket;
+    protected Socket clientSocket;
+    protected PrintWriter out;
+    protected BufferedReader in;
+    protected int id;
+    protected int port;
+
+
 
     public Server(){
         this.id = 1;
+        this.port = 4444;
     }
-
-    public  Server(int id) {
+    public Server(int port) {
+        this.port = port;
+    }
+    public  Server(int id, int port) {
+        this.port = port;
         this.id = id;
     }
 
-    public abstract void start(int port);
+
+    public abstract void start();
     public abstract void stop();
+
+
+
 
     public int idGetter(){
         return this.id;
