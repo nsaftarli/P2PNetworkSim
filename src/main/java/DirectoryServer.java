@@ -10,7 +10,6 @@ import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.ServerSocketChannel;
 
-
 /**
  * This is a server running in the directory pool. IDs should be numbers [1,4]
  * Inherits from Server so basic functionality is in that class. Overrides should be different.
@@ -33,7 +32,7 @@ public class DirectoryServer extends Server implements Runnable {
     public void start(){
         System.out.println("Server " + id + " started at port " + port);
         try {
-            serverSocket = new ServerSocket(port);
+            serverSocket = new ServerSocket(port); // TCP Connection
             datagramSocket = new DatagramSocket(port);
             while (true) {
                 clientSocket = serverSocket.accept();
@@ -50,56 +49,63 @@ public class DirectoryServer extends Server implements Runnable {
     public void stop(){}
 
     public void run() {}
+
+
     public void insertInHash(String key, String value) {
         int newKey = MiscFunctions.hashFunction(key);
         hashMap.put(newKey, value);
     }
 
     public static void main(String[] args) throws IOException {
-        int id = Integer.parseInt(args[0]);
-        int port = Integer.parseInt(args[1]);
+//        int id = Integer.parseInt(args[0]);
+//        int port = Integer.parseInt(args[1]);
 
         DirectoryServer dirServer = new DirectoryServer(12456);
 
-        // Step 1 : Create a socket to listen at port 1234
-        DatagramSocket ds = new DatagramSocket(1234);
-        byte[] receive = new byte[65535];
+        dirServer.runUDPConnection();
+    }
 
-        DatagramPacket DpReceive = null;
-        while (true)
-        {
 
-            // Step 2 : create a DatgramPacket to receive the data.
-            DpReceive = new DatagramPacket(receive, receive.length);
+    public void runUDPConnection(){
+        try {
+            System.out.println("UDP is starting up...");
 
-            // Step 3 : retrieve the data in byte buffer.
-            ds.receive(DpReceive);
 
-            System.out.println("Client:-" + data(receive));
+            DatagramSocket ds = new DatagramSocket(1234);
+            byte[] receive = new byte[65535];
 
-            // Exit the server if the client sends "bye"
-            if (data(receive).length() > 0) {
-                System.out.println("Client has received content.....EXITING");
-                int portNum = DpReceive.getPort();
-                String portNumStr = Integer.toString(portNum);
-                dirServer.insertInHash(portNumStr, data(receive).toString());
-                break;
+            DatagramPacket DpReceive = null;
+
+            while (true) {
+
+                DpReceive = new DatagramPacket(receive, receive.length); // receives data from P2P Client
+                ds.receive(DpReceive); // Data in the byte buffer
+
+                System.out.println("Client:-" + data(receive));
+
+                // TEMP: Exits server if the P2P Client content has been received
+                if (data(receive).length() > 0) {
+                    int portNum = DpReceive.getPort();
+
+                    System.out.println("Client has received content.....EXITING");
+
+                    String portNumStr = Integer.toString(portNum);
+                    insertInHash(portNumStr, data(receive).toString()); // Inserts record into hash map
+
+                    break;
+                }
+
+                // Clear the buffer after every message.
+                receive = new byte[65535];
+
             }
 
-            // Clear the buffer after every message.
-            receive = new byte[65535];
-
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
 
-        for (Integer name: dirServer.hashMap.keySet()){
-
-            String key = name.toString();
-            String value = dirServer.hashMap.get(name);
-            System.out.println(key + " " + value);
-
-
-        }
     }
+
 
     // A utility method to convert the byte array
     // data into a string representation.
