@@ -22,6 +22,7 @@ public class TestServer implements Runnable {
 
         System.out.println("Server started");
         try {
+            System.out.println("Port number is " + portNumber);
             ServerSocket serverSocket = new ServerSocket(portNumber);
             while (true) {
                 Socket clientSocket = serverSocket.accept();

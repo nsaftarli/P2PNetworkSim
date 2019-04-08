@@ -1,12 +1,9 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.*;
 import java.util.HashMap;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetSocketAddress;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.SocketAddress;
-import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.ServerSocketChannel;
 
@@ -17,16 +14,22 @@ import java.nio.channels.ServerSocketChannel;
  * Implements Runnable for multi-threading.
  */
 public class DirectoryServer extends Server implements Runnable {
+    private String clientMsg;
 
+    private HashMap<Integer, Integer> directory_map = new HashMap<Integer, Integer>();
 
     private HashMap<Integer, String> hashMap = new HashMap<Integer, String>();
 
 
-    public DirectoryServer(int id) {
+    public DirectoryServer(int id, Socket s) {
         super(id);
+        this.clientSocket = s;
+        buildServerTable();
     }
-    public DirectoryServer(int id, int port) {
+    public DirectoryServer(int id, int port, Socket s) {
         super(id, port);
+        this.clientSocket = s;
+        buildServerTable();
     }
 
     @Override
@@ -34,10 +37,10 @@ public class DirectoryServer extends Server implements Runnable {
         System.out.println("Server " + id + " started at port " + port);
         try {
             serverSocket = new ServerSocket(port);
-            datagramSocket = new DatagramSocket(port);
+//            datagramSocket = new DatagramSocket(port);
             while (true) {
                 clientSocket = serverSocket.accept();
-                new Thread(new DirectoryServer(id)).start();
+//                new Thread(new DirectoryServer(id)).start();
             }
 
         } catch (IOException e) {
@@ -49,7 +52,22 @@ public class DirectoryServer extends Server implements Runnable {
     @Override
     public void stop(){}
 
-    public void run() {}
+    public void run() {
+        try {
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            clientMsg = in.readLine();
+            if (clientMsg.equals("hello")) {
+                System.out.println("Got client message");
+                out.println("hi");
+            } else {
+                System.out.println("Got wrong message");
+                out.println("no");
+            }
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
     public void insertInHash(String key, String value) {
         int newKey = MiscFunctions.hashFunction(key);
         hashMap.put(newKey, value);
@@ -59,46 +77,60 @@ public class DirectoryServer extends Server implements Runnable {
         int id = Integer.parseInt(args[0]);
         int port = Integer.parseInt(args[1]);
 
-        DirectoryServer dirServer = new DirectoryServer(12456);
 
-        // Step 1 : Create a socket to listen at port 1234
-        DatagramSocket ds = new DatagramSocket(1234);
-        byte[] receive = new byte[65535];
 
-        DatagramPacket DpReceive = null;
-        while (true)
-        {
+//        DirectoryServer dirServer = new DirectoryServer(id, port);
 
-            // Step 2 : create a DatgramPacket to receive the data.
-            DpReceive = new DatagramPacket(receive, receive.length);
-
-            // Step 3 : retrieve the data in byte buffer.
-            ds.receive(DpReceive);
-
-            System.out.println("Client:-" + data(receive));
-
-            // Exit the server if the client sends "bye"
-            if (data(receive).length() > 0) {
-                System.out.println("Client has received content.....EXITING");
-                int portNum = DpReceive.getPort();
-                String portNumStr = Integer.toString(portNum);
-                dirServer.insertInHash(portNumStr, data(receive).toString());
-                break;
+        try {
+            ServerSocket serverSocket = new ServerSocket(port);
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+//                new Thread(new DirectoryServer(id, port, clientSocket)).start();
+                new ServerThread(clientSocket).start();
             }
 
-            // Clear the buffer after every message.
-            receive = new byte[65535];
-
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        for (Integer name: dirServer.hashMap.keySet()){
-
-            String key = name.toString();
-            String value = dirServer.hashMap.get(name);
-            System.out.println(key + " " + value);
-
-
-        }
+//        dirServer.start();
+        // Step 1 : Create a socket to listen at port 1234
+//        DatagramSocket ds = new DatagramSocket(1234);
+//        byte[] receive = new byte[65535];
+//
+//        DatagramPacket DpReceive = null;
+//        while (true)
+//        {
+//
+//            // Step 2 : create a DatgramPacket to receive the data.
+//            DpReceive = new DatagramPacket(receive, receive.length);
+//
+//            // Step 3 : retrieve the data in byte buffer.
+//            ds.receive(DpReceive);
+//
+//            System.out.println("Client:-" + data(receive));
+//
+//            // Exit the server if the client sends "bye"
+//            if (data(receive).length() > 0) {
+//                System.out.println("Client has received content.....EXITING");
+//                int portNum = DpReceive.getPort();
+//                String portNumStr = Integer.toString(portNum);
+//                dirServer.insertInHash(portNumStr, data(receive).toString());
+//                break;
+//            }
+//
+//            // Clear the buffer after every message.
+//            receive = new byte[65535];
+//
+//        }
+//
+//        for (Integer name: dirServer.hashMap.keySet()){
+//
+//            String key = name.toString();
+//            String value = dirServer.hashMap.get(name);
+//            System.out.println(key + " " + value);
+//
+//
+//        }
     }
 
     // A utility method to convert the byte array
@@ -115,6 +147,14 @@ public class DirectoryServer extends Server implements Runnable {
             i++;
         }
         return ret;
+    }
+
+    public void buildServerTable() {
+        for (int i = 0; i < 3; i++) {
+            System.out.println("Inserted into directory map server " + (i+1) + " with port " + (50680+i));
+            directory_map.put(i + 1, 50680 + i);
+        }
+
     }
 
 }
