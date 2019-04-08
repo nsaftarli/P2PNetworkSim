@@ -12,45 +12,50 @@ import java.util.Scanner;
  * This is the client service running on a peer in the network.
  */
 public class P2PClient {
-    private HashMap<Integer, String> directoryHashMap;
-    private HashMap<String, Record> recordHashMap;
+    private HashMap<Integer, String> directoryHashMap = new HashMap<>();
+    private HashMap<String, Record> recordHashMap = new HashMap<>();
     private ArrayList files;
 
     public static void main(String args[]) throws IOException {
 
-        P2PClient p = new P2PClient("2068");
+        P2PClient p = new P2PClient("20680"); // IP of Directory server ID=1 is 20680
         p.storeRecord("Test");
     }
 
     public P2PClient(String ip){
         // P2P client starts knowing IP of directory server with ID=1
-//        directoryHashMap.put(1, ip);
+        directoryHashMap.put(1, ip);
         for(int i = 2; i <= 4; i++) {
             // Use IP to ask DHT for IP addresses of remaining servers
             // retrievedIP = ...
             // directoryHashMap.put(i, retrievedIP);
+            // TEMP: incrementing port
+            int ipVal = Integer.parseInt(ip);
+            ipVal++;
+            ip = Integer.toString(ipVal);
+
+            directoryHashMap.put(i, ip);
         }
     }
 
     public void storeRecord(String name) {
-//        int serverID = MiscFunctions.hashFunction(name);
-//        String serverIP = getServerIP(serverID);
-        // Contact server with serverID to store record (content name, client IP)
+        int serverID = MiscFunctions.hashFunction(name);
+        String serverIP = getServerIP(serverID);
+        int UDPport = Integer.parseInt(serverIP);
+
+        // Contact directory server with serverID to store record (content name, client IP)
         try {
             DatagramSocket ds = new DatagramSocket();
-            InetAddress ip = InetAddress.getLocalHost();
+            InetAddress ip = InetAddress.getLocalHost(); // IP address
             byte buf[] = null;
 
             // convert the String input into the byte array.
             buf = name.getBytes();
 
-            // Step 2 : Create the datagramPacket for sending
-            // the data.
-            DatagramPacket DpSend =
-                    new DatagramPacket(buf, buf.length, ip, 1234);
+            // Create data packet
+            DatagramPacket DpSend = new DatagramPacket(buf, buf.length, ip, UDPport);
 
-            // Step 3 : invoke the send call to actually send
-            // the data.
+            // Send data to the directory server
             ds.send(DpSend);
 
         } catch (UnknownHostException uhe) {
@@ -62,9 +67,8 @@ public class P2PClient {
         }
 
         // Keep the local record (content name, server ID, server's IP address)
-//        Record record = new Record(name, serverID, serverIP);
-//        recordHashMap.put(name, record);
-
+        Record record = new Record(name, serverID, serverIP);
+        recordHashMap.put(name, record);
     }
 
 //    public int getServerID(String val){
