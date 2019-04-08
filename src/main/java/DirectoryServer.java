@@ -13,22 +13,21 @@ import java.nio.channels.ServerSocketChannel;
  * Inherits from Server so basic functionality is in that class. Overrides should be different.
  * Implements Runnable for multi-threading.
  */
-public class DirectoryServer extends Server implements Runnable {
+public class DirectoryServer extends Server {
     private String clientMsg;
 
-    private HashMap<Integer, Integer> directory_map = new HashMap<Integer, Integer>();
+    private static HashMap<Integer, Integer> directory_map = new HashMap<Integer, Integer>();
 
     private HashMap<Integer, String> hashMap = new HashMap<Integer, String>();
 
 
-    public DirectoryServer(int id, Socket s) {
+    public DirectoryServer(int id) {
         super(id);
-        this.clientSocket = s;
         buildServerTable();
     }
-    public DirectoryServer(int id, int port, Socket s) {
+    public DirectoryServer(int id, int port) {
         super(id, port);
-        this.clientSocket = s;
+        printStartupMessage();
         buildServerTable();
     }
 
@@ -52,22 +51,7 @@ public class DirectoryServer extends Server implements Runnable {
     @Override
     public void stop(){}
 
-    public void run() {
-        try {
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            clientMsg = in.readLine();
-            if (clientMsg.equals("hello")) {
-                System.out.println("Got client message");
-                out.println("hi");
-            } else {
-                System.out.println("Got wrong message");
-                out.println("no");
-            }
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-    }
+
     public void insertInHash(String key, String value) {
         int newKey = MiscFunctions.hashFunction(key);
         hashMap.put(newKey, value);
@@ -80,13 +64,12 @@ public class DirectoryServer extends Server implements Runnable {
 
 
 //        DirectoryServer dirServer = new DirectoryServer(id, port);
-
+        DirectoryServer dirServer = new DirectoryServer(id, port);
         try {
             ServerSocket serverSocket = new ServerSocket(port);
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-//                new Thread(new DirectoryServer(id, port, clientSocket)).start();
-                new ServerThread(clientSocket).start();
+                new ServerThread(clientSocket, directory_map).start();
             }
 
         } catch (IOException e) {
@@ -149,10 +132,15 @@ public class DirectoryServer extends Server implements Runnable {
         return ret;
     }
 
+
+    public void printStartupMessage() {
+        System.out.println("Started new server. This server has id " + id +
+                           " and is at port " + port);
+    }
     public void buildServerTable() {
-        for (int i = 0; i < 3; i++) {
-            System.out.println("Inserted into directory map server " + (i+1) + " with port " + (50680+i));
-            directory_map.put(i + 1, 50680 + i);
+        for (int i = 0; i <= 3; i++) {
+            System.out.println("Inserted into directory map server " + (i+1) + " with port " + (20680+i));
+            directory_map.put(i + 1, 20680 + i);
         }
 
     }
