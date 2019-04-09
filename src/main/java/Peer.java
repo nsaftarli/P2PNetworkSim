@@ -7,7 +7,7 @@ public class Peer {
     P2PClient p2pClient;
     public Peer() {
         p2pServer = new P2PServer();
-        p2pClient = new P2PClient("127.0.0.1");
+        p2pClient = new P2PClient();
     }
 
 
