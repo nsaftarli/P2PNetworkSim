@@ -19,7 +19,6 @@ public abstract class Server {
     protected int port;
 
 
-
     public Server(){
         this.id = 1;
         this.port = 4444;
@@ -27,7 +26,7 @@ public abstract class Server {
     public Server(int port) {
         this.port = port;
     }
-    public  Server(int id, int port) {
+    public Server(int id, int port) {
         this.port = port;
         this.id = id;
     }

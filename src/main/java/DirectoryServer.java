@@ -9,6 +9,7 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.ServerSocketChannel;
+import java.util.Scanner;
 
 /**
  * This is a server running in the directory pool. IDs should be numbers [1,4]
@@ -19,11 +20,9 @@ public class DirectoryServer extends Server implements Runnable {
 
 
     private HashMap<Integer, String> hashMap = new HashMap<Integer, String>();
+    public DatagramSocket ds;
 
-
-    public DirectoryServer(int id) {
-        super(id);
-    }
+    public DirectoryServer(int id) { super(id); }
     public DirectoryServer(int id, int port) {
         super(id, port);
     }
@@ -56,22 +55,28 @@ public class DirectoryServer extends Server implements Runnable {
         hashMap.put(newKey, value);
     }
 
+    public String getFromHash(String fileName) {
+        int newKey = MiscFunctions.hashFunction(fileName);
+        return hashMap.get(newKey);
+    }
+
     public static void main(String[] args) throws IOException {
-//        int id = Integer.parseInt(args[0]);
-//        int port = Integer.parseInt(args[1]);
+        int port = Integer.parseInt(args[1]);	       // The server's main port. The client will connect to this port using UDP. The predecessor server will also connect to this port using TCP.
+        int serverID = Integer.parseInt(args[0]);	   // The server's ID, which can be a number from 1 to n depending on the number of servers.
 
-        DirectoryServer dirServer = new DirectoryServer(12456);
-
-        dirServer.runUDPConnection();
+        DirectoryServer dirServer = new DirectoryServer(serverID, port);
+        dirServer.runUDPConnection(port);
+        int successorID = serverID++; // ID of the next server in the DHT
+        int successorPort = port++; // The port of the next server in the DHT.
     }
 
 
-    public void runUDPConnection(){
+    public void runUDPConnection(int port){
+        String msg;
         try {
             System.out.println("UDP is starting up...");
 
-
-            DatagramSocket ds = new DatagramSocket(1234);
+            ds = new DatagramSocket(port);
             byte[] receive = new byte[65535];
 
             DatagramPacket DpReceive = null;
@@ -80,19 +85,43 @@ public class DirectoryServer extends Server implements Runnable {
 
                 DpReceive = new DatagramPacket(receive, receive.length); // receives data from P2P Client
                 ds.receive(DpReceive); // Data in the byte buffer
+                msg = new String(DpReceive.getData());
+                System.out.println("Client:-" + msg);
 
-                System.out.println("Client:-" + data(receive));
 
                 // TEMP: Exits server if the P2P Client content has been received
-                if (data(receive).length() > 0) {
+                if (msg.length() > 0 && msg.contains("Upload")) {
                     int portNum = DpReceive.getPort();
 
-                    System.out.println("Client has received content.....EXITING");
+                    System.out.println("Client has received Upload: " + msg);
+                    Scanner sc = new Scanner(msg);
+                    sc.next();
+                    String fileName = sc.next().trim();
+                    System.out.println(fileName);
 
                     String portNumStr = Integer.toString(portNum);
-                    insertInHash(portNumStr, data(receive).toString()); // Inserts record into hash map
+                    insertInHash(fileName, portNumStr); // Inserts record into hash map
+                    String val = getFromHash(fileName);
+                    System.out.println(val);
+                } else if (msg.length() > 0 && msg.contains("Query")){
+                    System.out.println("Query done!!!");
+                    Scanner sc = new Scanner(msg);
+                    sc.next();
+                    String fileName = sc.next();
+                    String ip = getFromHash(fileName);
+                    System.out.println(ip);
 
-                    break;
+                    String clientIP = DpReceive.getAddress().toString();
+
+                    if (ip == null) {
+                        System.out.println("TO CLIENT -> " + "404" + " Padding" + "\n");
+                        sendDataToClient("404" + " Padding", clientIP, DpReceive.getPort());
+                    }
+                    // If the file is found, output the HTTP status code 200 OK.
+                    else {
+                        System.out.println("TO CLIENT -> " + "200" + " " + ip + " Padding" + "\n");
+                        sendDataToClient("200" + " " + ip + " Padding", clientIP, DpReceive.getPort());
+                    }
                 }
 
                 // Clear the buffer after every message.
@@ -123,4 +152,11 @@ public class DirectoryServer extends Server implements Runnable {
         return ret;
     }
 
+    public void sendDataToClient(String theMessage, String clientIP, int clientPort) throws IOException {
+        byte[] sendData = new byte[1024];
+        sendData = theMessage.getBytes();	// The String message converted into bytes, so it can be sent.
+        InetAddress ip = InetAddress.getByName(clientIP);	// Get Inet address of the client, given the IP.
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, ip, clientPort); // Create the UDP packet.
+        ds.send(sendPacket); // Send the UDP packet.
+    }
 }
