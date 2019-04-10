@@ -82,6 +82,7 @@ public class P2PClient {
     public P2PClient() {
 //        this.fileString = fileString;
 //        this.ip = this.LOCALHOST;
+        recordHashMap = new HashMap<String, Record>();
         directoryHashMap = new HashMap<Integer, Integer>();
         directoryHashMap.put(1, S1_PORT);
         init();
@@ -145,24 +146,33 @@ public class P2PClient {
     }
 
 
+    public void informAndUpdate(String[] filenames) {
+        int[] fileHashes = new int[filenames.length];
+        int i = 0;
+        for (String filename : filenames) {
+            fileHashes[i] = MiscFunctions.hashFunction(filename);
+            i++;
+        }
+
+    }
     public void storeRecord(String name) {
         int serverID = MiscFunctions.hashFunction(name);
         int UDPPort = getServerPort(serverID);
-        String serverIP = this.LOCALHOST;
+        String serverIP = Integer.toString(serverID);
         String msg = "Upload " + name;
 
         // Contact directory server with serverID to store record (content name, client IP)
         sendDataToDS(msg, serverIP, UDPPort);
 
         // Keep the local record (content name, server ID, server's IP address)
-//        Record record = new Record(name, UDPPort, serverIP);
-//        recordHashMap.put(name, record);
+        Record record = new Record(name, serverID, UDPPort);
+        recordHashMap.put(name, record);
     }
 
     public void queryRecord(String name) {
         int serverID = MiscFunctions.hashFunction(name);
         int UDPPort = getServerPort(serverID);
-        String serverIP = this.LOCALHOST;
+        String serverIP = Integer.toString(serverID);
         String msg = "Query " + name;
 
         // Contact directory server to query for record

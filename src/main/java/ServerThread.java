@@ -56,9 +56,9 @@ public class ServerThread extends Thread {
                 Set entrySet = file_map.entrySet();
                 for (Map.Entry entry : file_map.entrySet()) {
                     String key = (String) entry.getKey();
-                    if (entry.getValue() == clientID) {
-                        file_map.remove(key);
-                    }
+//                    if (entry.getValue() == clientID) {
+//                        file_map.remove(key);
+//                    }
                 }
 
                 //Inform other servers
@@ -110,9 +110,10 @@ public class ServerThread extends Thread {
             return response;
         } catch(IOException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
 
         throw new IOException("No response from server");
     }
