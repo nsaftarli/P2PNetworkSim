@@ -13,15 +13,20 @@ import java.util.Scanner;
  * This is the client service running on a peer in the network.
  */
 public class P2PClient {
+    // Address for server 1
     private final int S1_PORT = 20680;
+    // Address where client ports begin
     private final int C1_PORT = 20684;
     private final String LOCALHOST = "127.0.0.1";
+    // DHT ID -> DHT Port
     private HashMap<Integer, Integer> directoryHashMap;
+    // Content -> (Server ID, Server IP)
     private HashMap<String, Record> recordHashMap;
     private ArrayList files;
     DatagramSocket ds;
 
     private String ip;
+    private int peerPort;
     private Socket clientSocket;
     private PrintWriter out;
 //    private BufferedReader in;
@@ -85,7 +90,12 @@ public class P2PClient {
         recordHashMap = new HashMap<String, Record>();
         directoryHashMap = new HashMap<Integer, Integer>();
         directoryHashMap.put(1, S1_PORT);
+
+        //Change later:
+        peerPort = C1_PORT;
+
         init();
+
 //        sendRecordsToDHT(fileString);
     }
 
@@ -146,48 +156,63 @@ public class P2PClient {
     }
 
 
-    public void informAndUpdate(String[] filenames) {
-        int[] fileHashes = new int[filenames.length];
-        int i = 0;
-        for (String filename : filenames) {
-            fileHashes[i] = MiscFunctions.hashFunction(filename);
-            i++;
-        }
-
-    }
     public void storeRecord(String name) {
         int serverID = MiscFunctions.hashFunction(name);
-        int UDPPort = getServerPort(serverID);
-        String serverIP = Integer.toString(serverID);
+        int UDPPort = peerPort;
+        // Should be server port
+//        String serverIP = Integer.toString(serverID);
+        int serverPort = directoryHashMap.get(serverID);
+
         String msg = "Upload " + name;
 
         // Contact directory server with serverID to store record (content name, client IP)
-        sendDataToDS(msg, serverIP, UDPPort);
+        sendDataToDS(msg, serverPort);
 
         // Keep the local record (content name, server ID, server's IP address)
-        Record record = new Record(name, serverID, UDPPort);
+        Record record = new Record(name, serverID, serverPort);
         recordHashMap.put(name, record);
     }
 
-    public void queryRecord(String name) {
+    /**
+     *
+     * @param name
+     * @throws IOException
+     */
+    public void queryRecord(String name) throws IOException {
         int serverID = MiscFunctions.hashFunction(name);
-        int UDPPort = getServerPort(serverID);
+        int UDPPort = peerPort;
         String serverIP = Integer.toString(serverID);
+        int serverPort = directoryHashMap.get(serverID);
         String msg = "Query " + name;
 
         // Contact directory server to query for record
-        sendDataToDS(msg, serverIP, UDPPort);
+        sendDataToDS(msg, serverPort);
+        msg = receiveDataFromDS(UDPPort);
+        System.out.println(msg);
+        Scanner scan = new Scanner(msg);
+        String statusCode = scan.next();
+        if (Integer.parseInt(statusCode) == 200) {
+            // Read in destination port
+
+            // Generate HTTP header object
+
+            // Send request to destination port (P2PServer)
+
+            // Receive file
+
+        }
+
     }
 
-    public void sendDataToDS(String msg, String serverIP, int serverPort){
+    public void sendDataToDS(String msg, int serverPort){
         try {
             ds = new DatagramSocket();
-            InetAddress inetAddress = InetAddress.getLocalHost(); // Get the Inet address of the server.
+            InetAddress inetAddress = InetAddress.getByName(this.LOCALHOST); // Get the Inet address of the server.
             System.out.println(inetAddress);
-            byte buf[] = null;
+//            byte buf[] = null;
 
             // convert the String input into the byte array.
-            buf = msg.getBytes();
+            byte buf[] = msg.getBytes();
 
             // Create data packet
             DatagramPacket DpSend = new DatagramPacket(buf, buf.length, inetAddress, serverPort);
@@ -218,6 +243,18 @@ public class P2PClient {
 
     public void insertIntoRecordHashMap(String key, Record record) {
         recordHashMap.put(key, record);
+    }
+
+    public String receiveDataFromDS(int UDPPort) throws IOException {
+        String msg;
+        byte[] receiveData = new byte[1024];
+        System.out.printf("Listening on udp:%s:%d%n",
+                InetAddress.getByName(this.LOCALHOST), UDPPort);
+        DatagramPacket recievePacket = new DatagramPacket(receiveData, receiveData.length);
+        ds.receive(recievePacket);
+        msg = new String(recievePacket.getData(), 0, recievePacket.getLength());
+        System.out.println("Received packet!");
+        return msg;
     }
 
     public void exit() throws Exception {

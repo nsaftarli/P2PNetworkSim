@@ -1,7 +1,11 @@
+import javafx.scene.chart.PieChart;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.*;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.util.HashMap;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -13,7 +17,9 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.ServerSocketChannel;
+import java.util.Iterator;
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  * This is a server running in the directory pool. IDs should be numbers [1,4]
@@ -23,12 +29,18 @@ import java.util.Scanner;
 public class DirectoryServer extends Server {
     private String clientMsg;
 
+    // DHT server ID -> DHT server port
     private static HashMap<Integer, Integer> directory_map = new HashMap<Integer, Integer>();
 
-    private static HashMap<Integer, String> hashMap = new HashMap<Integer, String>();
-    public DatagramSocket ds;
+    //
+    private static HashMap<String, Integer> peerMap = new HashMap<String, Integer>();
+    public static DatagramSocket ds;
+    public static DatagramChannel dc;
+    public static ServerSocketChannel sc;
 
     private final String LOCALHOST = "127.0.0.1";
+    private final int C1_PORT = 20684;
+
 
 
 
@@ -48,14 +60,12 @@ public class DirectoryServer extends Server {
     @Override
     public void stop(){}
 
-    public void insertInHash(String key, String value) {
-        int newKey = MiscFunctions.hashFunction(key);
-        hashMap.put(newKey, value);
+    public void insertInHash(String key, int value) {
+        peerMap.put(key, value);
     }
 
-    public String getFromHash(String fileName) {
-        int newKey = MiscFunctions.hashFunction(fileName);
-        return hashMap.get(newKey);
+    public Integer getFromHash(String fileName) {
+        return peerMap.get(fileName);
     }
 
     public static void main(String[] args) throws IOException {
@@ -63,24 +73,35 @@ public class DirectoryServer extends Server {
         int serverID = Integer.parseInt(args[0]);	   // The server's ID, which can be a number from 1 to n depending on the number of servers.
 
         DirectoryServer dirServer = new DirectoryServer(serverID, port);
+//        ListenerThreadTCP listenerThreadTCP =  new ListenerThreadTCP(port, directory_map, peerMap);
+        new ListenerThreadTCP(port, directory_map, peerMap).start();
+        new ListenerThreadUDP(port, directory_map, peerMap).start();
+//        while (true) {
+//            new ListenerThreadTCP()
+//        }
+
 //        dirServer.runUDPConnection(port);
 //        int successorID = serverID++; // ID of the next server in the DHT
 //        int successorPort = port++; // The port of the next server in the DHT.
 
-        try {
-            ServerSocket serverSocket = new ServerSocket(port);
-            dirServer.ds = new DatagramSocket(port);
-
-            while (true) {
-                Socket clientSocket = serverSocket.accept();
-                new ServerThread(clientSocket, directory_map, hashMap).start();
-                new ServerThread(dirServer.ds).start();
-                dirServer.runUDPConnection(port);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            ServerSocket serverSocket = new ServerSocket(port);
+//            dirServer.ds = new DatagramSocket(port);
+//
+//            ds = new DatagramSocket(port);
+//            while (true) {
+//                Socket clientSocket = serverSocket.accept();
+//                if (clientSocket != null) {
+//                    new ServerThread(clientSocket, directory_map, peerMap).start();
+//                }
+//                new ServerThread(clientSocket, directory_map, peerMap).start();
+//                new ServerThread(ds, directory_map, peerMap).start();
+//                dirServer.runUDPConnection(port);
+//            }
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
     }
 
@@ -91,7 +112,7 @@ public class DirectoryServer extends Server {
         try {
             System.out.println("UDP is starting up...");
 
-//            ds = new DatagramSocket(port);
+            ds = new DatagramSocket(port);
             byte[] receive = new byte[65535];
 
             DatagramPacket DpReceive = null;
@@ -106,7 +127,6 @@ public class DirectoryServer extends Server {
 
                 // TEMP: Exits server if the P2P Client content has been received
                 if (msg.length() > 0 && msg.contains("Upload")) {
-                    int portNum = DpReceive.getPort();
 
                     System.out.println("Client has received Upload: " + msg);
                     Scanner sc = new Scanner(msg);
@@ -114,18 +134,18 @@ public class DirectoryServer extends Server {
                     String fileName = sc.next().trim();
                     System.out.println(fileName);
 
-                    String portNumStr = Integer.toString(portNum);
-                    insertInHash(fileName, portNumStr); // Inserts record into hash map
-                    String val = getFromHash(fileName);
+                    insertInHash(fileName, port); // Inserts record into hash map
+                    int val = getFromHash(fileName);
                     System.out.println(val);
                 } else if (msg.length() > 0 && msg.contains("Query")){
                     System.out.println("Query done!!!");
                     Scanner sc = new Scanner(msg);
                     sc.next();
-                    String fileName = sc.next();
+                    String fileName = sc.next().trim();
                     // Port Number for client
-                    String ip = getFromHash(fileName);
+                    Integer ip = getFromHash(fileName);
                     System.out.println(ip);
+                    String ipString = Integer.toString(ip);
 
                     //
                     String clientIP = DpReceive.getAddress().toString().substring(1);

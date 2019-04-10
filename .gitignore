@@ -3,3 +3,5 @@ target/
 out/
 info/
 .DS_Store
+*.jpg
+*.png

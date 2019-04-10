@@ -1,4 +1,5 @@
 import java.io.*;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -6,11 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class ServerThread extends Thread {
+public class DirectoryThread extends Thread {
     protected ServerSocket serverSocket;
     protected Socket clientSocket;
     protected DatagramSocket clientDatagramSocket;
-//    protected PrintWriter out;
+    //    protected PrintWriter out;
     protected PrintWriter str_out;
     protected BufferedReader in;
     protected String clientMsg;
@@ -20,24 +21,19 @@ public class ServerThread extends Thread {
     protected HashMap<String, Integer> file_map;
     private String LOCALHOST = "127.0.0.1";
 
-    public ServerThread(DatagramSocket clientDatagramSocket, HashMap directory_map, HashMap file_map) {
+    public DirectoryThread(DatagramSocket clientDatagramSocket, HashMap directory_map, HashMap file_map) {
         this.clientDatagramSocket = clientDatagramSocket;
         this.directory_map = directory_map;
         this.file_map = file_map;
     }
-    public ServerThread(Socket clientSocket) {
-        this.clientSocket = clientSocket;
-    }
-    public ServerThread(Socket clientSocket, HashMap directory_map, HashMap file_map) {
-        this.clientSocket = clientSocket;
-        this.directory_map = directory_map;
-        this.file_map = file_map;
 
-    }
     public void run() {
 
         try {
 //            out = new PrintWriter(clientSocket.getOutputStream(), true);
+            byte [] buffer = new byte[2048];
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+            clientDatagramSocket.receive(packet);
             ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             clientMsg = in.readLine();
@@ -131,4 +127,3 @@ public class ServerThread extends Thread {
     }
 
 }
-
