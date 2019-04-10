@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.*;
 import java.util.HashMap;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -16,26 +20,37 @@ import java.util.Scanner;
  * Inherits from Server so basic functionality is in that class. Overrides should be different.
  * Implements Runnable for multi-threading.
  */
-public class DirectoryServer extends Server implements Runnable {
+public class DirectoryServer extends Server {
+    private String clientMsg;
 
+    private static HashMap<Integer, Integer> directory_map = new HashMap<Integer, Integer>();
 
     private HashMap<Integer, String> hashMap = new HashMap<Integer, String>();
     public DatagramSocket ds;
 
-    public DirectoryServer(int id) { super(id); }
+    private final String LOCALHOST = "127.0.0.1";
+
+
+
+    public DirectoryServer(int id) {
+        super(id);
+        buildServerTable();
+    }
     public DirectoryServer(int id, int port) {
         super(id, port);
+        printStartupMessage();
+        buildServerTable();
     }
 
     @Override
     public void start(){
         System.out.println("Server " + id + " started at port " + port);
         try {
-            serverSocket = new ServerSocket(port); // TCP Connection
-            datagramSocket = new DatagramSocket(port);
+            serverSocket = new ServerSocket(port);
+//            datagramSocket = new DatagramSocket(port);
             while (true) {
                 clientSocket = serverSocket.accept();
-                new Thread(new DirectoryServer(id)).start();
+//                new Thread(new DirectoryServer(id)).start();
             }
 
         } catch (IOException e) {
@@ -48,7 +63,6 @@ public class DirectoryServer extends Server implements Runnable {
     public void stop(){}
 
     public void run() {}
-
 
     public void insertInHash(String key, String value) {
         int newKey = MiscFunctions.hashFunction(key);
@@ -65,10 +79,27 @@ public class DirectoryServer extends Server implements Runnable {
         int serverID = Integer.parseInt(args[0]);	   // The server's ID, which can be a number from 1 to n depending on the number of servers.
 
         DirectoryServer dirServer = new DirectoryServer(serverID, port);
-        dirServer.runUDPConnection(port);
-        int successorID = serverID++; // ID of the next server in the DHT
-        int successorPort = port++; // The port of the next server in the DHT.
+//        dirServer.runUDPConnection(port);
+//        int successorID = serverID++; // ID of the next server in the DHT
+//        int successorPort = port++; // The port of the next server in the DHT.
+
+        try {
+            ServerSocket serverSocket = new ServerSocket(port);
+            dirServer.ds = new DatagramSocket(port);
+
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                new ServerThread(clientSocket, directory_map).start();
+                new ServerThread(dirServer.ds).start();
+                dirServer.runUDPConnection(port);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
+
 
 
     public void runUDPConnection(int port){
@@ -76,7 +107,7 @@ public class DirectoryServer extends Server implements Runnable {
         try {
             System.out.println("UDP is starting up...");
 
-            ds = new DatagramSocket(port);
+//            ds = new DatagramSocket(port);
             byte[] receive = new byte[65535];
 
             DatagramPacket DpReceive = null;
@@ -111,7 +142,7 @@ public class DirectoryServer extends Server implements Runnable {
                     String ip = getFromHash(fileName);
                     System.out.println(ip);
 
-                    String clientIP = DpReceive.getAddress().toString();
+                    String clientIP = this.LOCALHOST;
 
                     if (ip == null) {
                         System.out.println("TO CLIENT -> " + "404" + " Padding" + "\n");
@@ -159,4 +190,17 @@ public class DirectoryServer extends Server implements Runnable {
         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, ip, clientPort); // Create the UDP packet.
         ds.send(sendPacket); // Send the UDP packet.
     }
+
+    public void printStartupMessage() {
+        System.out.println("Started new server. This server has id " + id +
+                           " and is at port " + port);
+    }
+    public void buildServerTable() {
+        for (int i = 0; i <= 3; i++) {
+            System.out.println("Inserted into directory map server " + (i+1) + " with port " + (20680+i));
+            directory_map.put(i + 1, 20680 + i);
+        }
+
+    }
+
 }
