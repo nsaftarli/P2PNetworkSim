@@ -14,11 +14,11 @@ public class Main {
 
         System.out.println("Starting connection at " + ipAddress + " port " + portNumber);
 
-        TestClient client = new TestClient();
-        client.startConnection(ipAddress, portNumber);
-        String serverResponse = client.sendMessage("helloo");
-        System.out.println(serverResponse);
-        client.stopConnection();
+//        TestClient client = new TestClient();
+//        client.startConnection(ipAddress, portNumber);
+//        String serverResponse = client.sendMessage("helloo");
+//        System.out.println(serverResponse);
+//        client.stopConnection();
 
 //        client.startConnection(ipAddress, portNumber);
 
@@ -54,9 +54,9 @@ public class Main {
 //        serverResponse = client.sendMessage("hi");
 //        System.out.println(serverResponse);
 //        client.stopConnection();
-        client.startConnection(ipAddress, portNumber);
-        serverResponse = client.sendMessage("hi");
-        System.out.println(serverResponse);
-        client.stopConnection();
+//        client.startConnection(ipAddress, portNumber);
+//        serverResponse = client.sendMessage("hi");
+//        System.out.println(serverResponse);
+//        client.stopConnection();
     }
 }

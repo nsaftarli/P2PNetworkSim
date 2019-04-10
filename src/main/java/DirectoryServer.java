@@ -102,11 +102,10 @@ public class DirectoryServer extends Server {
                 ds.receive(DpReceive); // Data in the byte buffer
                 msg = new String(DpReceive.getData());
                 System.out.println("Client:-" + msg);
-
+                int portNum = DpReceive.getPort();
 
                 // TEMP: Exits server if the P2P Client content has been received
                 if (msg.length() > 0 && msg.contains("Upload")) {
-                    int portNum = DpReceive.getPort();
 
                     System.out.println("Client has received Upload: " + msg);
                     Scanner sc = new Scanner(msg);
@@ -127,18 +126,18 @@ public class DirectoryServer extends Server {
                     String ip = getFromHash(fileName);
                     System.out.println(ip);
 
-                    //
                     String clientIP = DpReceive.getAddress().toString().substring(1);
                     System.out.println(clientIP);
 
                     if (ip == null) {
                         System.out.println("TO CLIENT -> " + "404" + " Padding" + "\n");
-                        sendDataToClient("404" + " Padding", clientIP, DpReceive.getPort());
+                        sendDataToClient("404" + " Padding", clientIP, portNum);
                     }
                     // If the file is found, output the HTTP status code 200 OK.
                     else {
                         System.out.println("TO CLIENT -> " + "200" + " " + ip + " Padding" + "\n");
-                        sendDataToClient("200" + " " + ip + " Padding", clientIP, DpReceive.getPort());
+                        sendDataToClient("200" + " " + ip + " Padding", clientIP, portNum);
+
                     }
                 }
 

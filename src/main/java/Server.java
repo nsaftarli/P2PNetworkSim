@@ -35,9 +35,6 @@ public abstract class Server {
     public abstract void start();
     public abstract void stop();
 
-
-
-
     public int idGetter(){
         return this.id;
     }
