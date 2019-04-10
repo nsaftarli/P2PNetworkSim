@@ -25,7 +25,7 @@ public class DirectoryServer extends Server {
 
     private static HashMap<Integer, Integer> directory_map = new HashMap<Integer, Integer>();
 
-    private HashMap<Integer, String> hashMap = new HashMap<Integer, String>();
+    private static HashMap<Integer, String> hashMap = new HashMap<Integer, String>();
     public DatagramSocket ds;
 
     private final String LOCALHOST = "127.0.0.1";
@@ -43,26 +43,10 @@ public class DirectoryServer extends Server {
     }
 
     @Override
-    public void start(){
-        System.out.println("Server " + id + " started at port " + port);
-        try {
-            serverSocket = new ServerSocket(port);
-//            datagramSocket = new DatagramSocket(port);
-            while (true) {
-                clientSocket = serverSocket.accept();
-//                new Thread(new DirectoryServer(id)).start();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
+    public void start(){}
 
     @Override
     public void stop(){}
-
-    public void run() {}
 
     public void insertInHash(String key, String value) {
         int newKey = MiscFunctions.hashFunction(key);
@@ -89,7 +73,7 @@ public class DirectoryServer extends Server {
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                new ServerThread(clientSocket, directory_map).start();
+                new ServerThread(clientSocket, directory_map, hashMap).start();
                 new ServerThread(dirServer.ds).start();
                 dirServer.runUDPConnection(port);
             }
@@ -139,10 +123,13 @@ public class DirectoryServer extends Server {
                     Scanner sc = new Scanner(msg);
                     sc.next();
                     String fileName = sc.next();
+                    // Port Number for client
                     String ip = getFromHash(fileName);
                     System.out.println(ip);
 
-                    String clientIP = this.LOCALHOST;
+                    //
+                    String clientIP = DpReceive.getAddress().toString().substring(1);
+                    System.out.println(clientIP);
 
                     if (ip == null) {
                         System.out.println("TO CLIENT -> " + "404" + " Padding" + "\n");
