@@ -95,7 +95,6 @@ public class P2PClient {
         System.out.println("Trying to retrieve locations of other servers from server 1");
         startConnection(LOCALHOST, S1_PORT);
         try {
-//            DirectoryMapRecord[] resp = (DirectoryMapRecord[]) sendMessage("serverLocs");
             int[] resp = (int[]) sendMessage("serverLocs");
             System.out.println(resp);
             for(int i = 0; i < 4; i++) {
