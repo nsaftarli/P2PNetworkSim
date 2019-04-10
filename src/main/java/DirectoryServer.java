@@ -18,7 +18,7 @@ public class DirectoryServer extends Server {
 
     private static HashMap<Integer, Integer> directory_map = new HashMap<Integer, Integer>();
 
-    private HashMap<Integer, String> hashMap = new HashMap<Integer, String>();
+    private static HashMap<Integer, String> hashMap = new HashMap<Integer, String>();
 
 
     public DirectoryServer(int id) {
@@ -68,8 +68,13 @@ public class DirectoryServer extends Server {
         try {
             ServerSocket serverSocket = new ServerSocket(port);
             while (true) {
+                //TCP
+//                ServerSocket serverSocket = new ServerSocket(port);
                 Socket clientSocket = serverSocket.accept();
-                new ServerThread(clientSocket, directory_map).start();
+                new ServerThread(clientSocket, directory_map, hashMap).start();
+
+                //UDP
+
             }
 
         } catch (IOException e) {

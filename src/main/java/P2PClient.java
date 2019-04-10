@@ -25,7 +25,8 @@ public class P2PClient {
     private ObjectInputStream in;
     public static void main(String args[]) throws IOException {
 
-        P2PClient p = new P2PClient("2068", "abc");
+
+        P2PClient p = new P2PClient("20680", "abc");
         p.storeRecord("Test");
     }
 
@@ -41,7 +42,6 @@ public class P2PClient {
 
     // For now assume only 1 file per client, and for now just a string
     public P2PClient(String ip, String fileString) {
-//        this.fileString = fileString;
         this.ip = ip;
         directoryHashMap = new HashMap<Integer, Integer>();
         directoryHashMap.put(1, S1_PORT);
@@ -56,7 +56,6 @@ public class P2PClient {
         System.out.println("Trying to retrieve locations of other servers from server 1");
         startConnection(LOCALHOST, S1_PORT);
         try {
-//            DirectoryMapRecord[] resp = (DirectoryMapRecord[]) sendMessage("serverLocs");
             int[] resp = (int[]) sendMessage("serverLocs");
             System.out.println(resp);
             for(int i = 0; i < 4; i++) {
@@ -145,10 +144,28 @@ public class P2PClient {
 
     }
 
+
+
+
     public void sendRecordsToDHT(String fileString) {
+        // Hash name to server ID
         int serverID = MiscFunctions.hashFunction(fileString);
+        int serverPort = directoryHashMap.get(serverID);
+
+        startConnection(LOCALHOST, serverPort);
+
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+            outputStream.defaultWriteObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
         DirectoryRecord r = new DirectoryRecord(fileString, this.ip);
         System.out.println("Trying to send record for" + fileString + " to server " + serverID);
+
 
     }
 //    public int getServerID(String val){
