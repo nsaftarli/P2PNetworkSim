@@ -43,26 +43,10 @@ public class DirectoryServer extends Server {
     }
 
     @Override
-    public void start(){
-        System.out.println("Server " + id + " started at port " + port);
-        try {
-            serverSocket = new ServerSocket(port);
-//            datagramSocket = new DatagramSocket(port);
-            while (true) {
-                clientSocket = serverSocket.accept();
-//                new Thread(new DirectoryServer(id)).start();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
+    public void start(){}
 
     @Override
     public void stop(){}
-
-    public void run() {}
 
     public void insertInHash(String key, String value) {
         int newKey = MiscFunctions.hashFunction(key);

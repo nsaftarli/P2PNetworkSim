@@ -12,7 +12,6 @@ public class ServerThread extends Thread {
     protected BufferedReader in;
     protected String clientMsg;
     protected HashMap<Integer, Integer> directory_map;
-//    protected DirectoryMapRecord[] records;
 
     public ServerThread(DatagramSocket clientDatagramSocket) {
         this.clientDatagramSocket = clientDatagramSocket;
@@ -34,7 +33,6 @@ public class ServerThread extends Thread {
             clientMsg = in.readLine();
             if (clientMsg.equals("serverLocs")) {
                 System.out.println("serverLocs");
-//                DirectoryMapRecord[] serverLocs = getRecords();
                 int[] serverLocs = getServerLocs();
                 out.writeObject(serverLocs);
             }
@@ -59,12 +57,5 @@ public class ServerThread extends Thread {
         return locs;
     }
 
-//    public DirectoryMapRecord[] getRecords() {
-//        DirectoryMapRecord[] locs = new DirectoryMapRecord[4];
-//        for (int i = 0; i < 4; i++) {
-//            locs[i] = new DirectoryMapRecord(i+1, directory_map.get(i+1));
-//        }
-//        return locs;
-//    }
 }
 
