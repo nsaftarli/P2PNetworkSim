@@ -11,16 +11,16 @@ P2PClient to P2PServer interacts with a TCP connection.
 
 ## SETUP FOR LOCAL TESTING
 
-Step 1: Start Intellij on a computer and open the project folder. File -> Open
-Step 2: Navigate to "P2PPhotoAlbum"
+1. Start Intellij on a computer and open the project folder. File -> Open
+2. Navigate to "P2PPhotoAlbum"
 
 ## SETTING UP THE DIRECTORY SERVERS
 
-Step 1: Second toolbar from the top beside the hammer icon. Click the drop down -> edit configuations
-Step 2: Plus icon -> Application
-Step 3: Name: DServer1(2, 3, 4 - set up 4 different configurations)
-Step 4: Main class -> DirectoryServer
-Step 5: Program Arguments for each DServer is the ID# and Port#
+1. Second toolbar from the top beside the hammer icon. Click the drop down -> edit configuations
+2. Plus icon -> Application
+3. Name: DServer1(2, 3, 4 - set up 4 different configurations)
+4. Main class -> DirectoryServer
+5. Program Arguments for each DServer is the ID# and Port#
 		For DServer1, this will be: 1 20680
 		DServer2, this will be: 2 20681
 		DServer3, this will be 3 20682
@@ -28,19 +28,19 @@ Step 5: Program Arguments for each DServer is the ID# and Port#
 
 ## SETTING UP P2PClient for testing Upload
 
-Step 1: Second toolbar from the top beside the hammer icon. Click the drop down -> edit configuations
-Step 2: Plus icon -> Application
-Step 3: Name: P2PClientUpload
-Step 4: Main class -> P2PClient
-Step 5: Program Arguments will take a port#: 20684
+1. Second toolbar from the top beside the hammer icon. Click the drop down -> edit configuations
+2. Plus icon -> Application
+3. Name: P2PClientUpload
+4. Main class -> P2PClient
+5. Program Arguments will take a port#: 20684
 
 ## SETTING UP P2PClient for testing Download
 
-Step 1: Second toolbar from the top beside the hammer icon. Click the drop down -> edit configuations
-Step 2: Plus icon -> Application
-Step 3: Name: P2PClientDownload
-Step 4: Main class -> P2PClient
-Step 5: Program Arguments will take a port#: 20685
+1. Second toolbar from the top beside the hammer icon. Click the drop down -> edit configuations
+2. Plus icon -> Application
+3. Name: P2PClientDownload
+4. Main class -> P2PClient
+5. Program Arguments will take a port#: 20685
 
 ## SETTING UP Resource Folder file paths
 	Within the P2PPhotoAlbum, create two directories: resources_in and resources_out.
@@ -55,14 +55,14 @@ Step 5: Program Arguments will take a port#: 20685
 
 ## RUNNING LOCALLY
 
-Step 1: Run all four Directory Servers
-Step 2: Run the P2PClientUpload
-Step 3: Run the P2PClientDownload
-Step 4: In the P2PClientUpload command line, enter U to select Upload.
-Step 5: Enter `<yourFileName>.jpg` in the command line, to upload the test image file.
-Step 6: In the P2PClientDownload command line, enter Q to select Querying for downloading the test file
-Step 7: Enter `<yourFileName>.jpg` in the command line for P2PClientDownload for the download to begin
-Step 8: Wait for the image to load
+1. Run all four Directory Servers
+2. Run the P2PClientUpload
+3. Run the P2PClientDownload
+4. In the P2PClientUpload command line, enter U to select Upload.
+5. Enter `<yourFileName>.jpg` in the command line, to upload the test image file.
+6. In the P2PClientDownload command line, enter Q to select Querying for downloading the test file
+7. Enter `<yourFileName>.jpg` in the command line for P2PClientDownload for the download to begin
+8. Wait for the image to load
 
 
 ## SETTING UP FOR LAB TESTING
@@ -71,18 +71,16 @@ Step 8: Wait for the image to load
 		the IPAddress of the machine that runs the Directory Servers.
 
 ## RUNNING IN THE LAB
-Step 1: Run all four Directory Servers on one machine (This will be the IPAddress that the Peer Clients connect to)
 
-Step 2: Run the P2PClientUpload on a second machine (Change `LOCALHOST` constant value within P2PClient.java from `127.0.0.1` to
+1. Run all four Directory Servers on one machine (This will be the IPAddress that the Peer Clients connect to)
+2. Run the P2PClientUpload on a second machine (Change `LOCALHOST` constant value within P2PClient.java from `127.0.0.1` to
 		the IPAddress of the machine that runs the Directory Servers.)
-
-Step 3: Run the P2PClientDownload on a third machine (Change `LOCALHOST` constant value within P2PClient.java from `127.0.0.1` to
+3. Run the P2PClientDownload on a third machine (Change `LOCALHOST` constant value within P2PClient.java from `127.0.0.1` to
 		the IPAddress of the machine that runs the Directory Servers)
-
-Step 4: In the P2PClientUpload command line, enter U to select Upload.
-Step 5: Enter `<yourFileName>.jpg` in the command line, to upload the test image file.
-Step 6: In the P2PClientDownload command line, enter Q to select Querying for downloading the test file
-Step 7: Enter `<yourFileName>.jpg` in the command line for P2PClientDownload for the download to begin
-Step 8: Wait for the image to load
+4. In the P2PClientUpload command line, enter U to select Upload.
+5. Enter `<yourFileName>.jpg` in the command line, to upload the test image file.
+6. In the P2PClientDownload command line, enter Q to select Querying for downloading the test file
+7. Enter `<yourFileName>.jpg` in the command line for P2PClientDownload for the download to begin
+8. Wait for the image to load
 
  
