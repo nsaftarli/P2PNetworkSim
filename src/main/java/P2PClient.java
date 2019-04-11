@@ -173,15 +173,8 @@ public class P2PClient {
 
     public String sendPeerMessage(String msg) throws IOException {
         String response;
-
         out.println(msg);
-        try {
-            response = str_in.readLine();
-            return response;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        throw new IOException("No response from server");
+        return null;
     }
 
 
@@ -239,30 +232,20 @@ public class P2PClient {
 
             byte[] size_arr = new byte[4];
             inputStream.read(size_arr);
-//            int size = ByteBuffer.wra
-            // Receive file
-//            InputStream inputStream = clientSocket.getInputStream();
-//            OutputStream outputStream = new FileOutputStream("/Users/Nariman/Documents/School/CPS706/ClientServer/resources_out/" + name);
-//
-//            byte[] buffer = new byte[2048];
-//            int bytesRead;
-//            while ((bytesRead = inputStream.read(buffer)) != -1) {
-//                outputStream.write(buffer, 0, bytesRead);
-//            }
-//            outputStream.wr
-//            out.close();
+            int size = ByteBuffer.wrap(size_arr).asIntBuffer().get();
 
-            InputStream inputStream = clientSocket.getInputStream();
-            byte[] img_size = new byte[4];
+            byte[] image_arr = new byte[size];
+            inputStream.read(image_arr);
 
-            inputStream.read(img_size);
-            int size = ByteBuffer.wrap(img_size).asIntBuffer().get();
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(image_arr));
+            ImageIO.write(image, "jpg", new File("/Users/Nariman/Documents/School/CPS706/ClientServer/resources_out/" + name));
 
-            byte[] img_arr = new byte[size];
-            BufferedImage image = ImageIO.read(new ByteArrayInputStream(img_arr));
-
-            ImageIO.write(image, "png", new File("/Users/Nariman/Documents/School/CPS706/ClientServer/resources_out/"))
-
+            storeRecord(name);
+            JFrame frame = new JFrame();
+            frame.getContentPane().add(new JLabel(new ImageIcon(image)));
+            frame.pack();
+            frame.setVisible(true);
+//            clientSocket.close();
         }
 
     }

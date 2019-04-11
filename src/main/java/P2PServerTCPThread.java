@@ -30,63 +30,22 @@ public class P2PServerTCPThread extends Thread{
                 System.out.println(file.toString());
                 System.out.println("CCCCCC");
 
-//                byte[] fileBytes = new byte[(int) file.length()];
-//                FileInputStream fileInputStream = new FileInputStream(file);
-//                BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
-//                bufferedInputStream.read(fileBytes, 0, fileBytes.length);
-//
-//                OutputStream outputStream = clientSocket.getOutputStream();
-//                outputStream.write(fileBytes, 0, fileBytes.length);
-//                outputStream.flush();
-//                ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
-//                OutputStream outputStream = clientSocket.getOutputStream();
-//                DataOutputStream dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
-//                BufferedImage image = ImageIO.read(file);
-//                ImageIO.write(image, "png", dataOutputStream);
-//
-//                BufferedImage image = ImageIO.read(file);
-//                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//                ImageIO.write(image, "png", byteArrayOutputStream);
-//
-//                byte[] img_bytes = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
-//                outputStream.write(img_bytes);
-//                outputStream.write(byteArrayOutputStream.toByteArray());
-//                outputStream.flush();
-
-//                OutputStream outputStream = clientSocket.getOutputStream();
-//                BufferedImage image = ImageIO.read(file);
-//                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//                ImageIO.write(image, "png", byteArrayOutputStream);
-//
-//                byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
-//                outputStream.write(size);
-//                outputStream.write(byteArrayOutputStream.toByteArray());
-//                outputStream.flush();
-//                clientSocket.close();
-
-//                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(clientSocket.getOutputStream());
-//                BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
-//
-//                byte[] buff = new byte[4096];
-//                int bytesRead;
-//                while ( (bytesRead = bufferedInputStream.read(buff)) != -1 ) {
-//                    bufferedOutputStream.write(buff, 0, bytesRead);
-//                }
-//                bufferedInputStream.close();
-//                bufferedOutputStream.flush();
-//                bufferedOutputStream.close();
-
-                DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
-                DataOutputStream dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
-
+                OutputStream out = clientSocket.getOutputStream();
                 BufferedImage img = ImageIO.read(file);
-                ImageIO.write(img, "PNG", clientSocket.getOutputStream());
-
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                ImageIO.write(img, "JPG", byteArrayOutputStream);
+                byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
+                out.write(size);
+                out.write(byteArrayOutputStream.toByteArray());
+                out.flush();
+                Thread.sleep(5000);
                 System.out.println("Sent file");
                 clientSocket.close();
 
             }
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
