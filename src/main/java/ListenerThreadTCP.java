@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Scanner;
 
+
 public class ListenerThreadTCP extends Thread {
     ServerSocket serverSocket;
     int port;
@@ -12,6 +13,13 @@ public class ListenerThreadTCP extends Thread {
     HashMap<String, Integer> peerMap;
     Scanner scanner;
 
+    /**
+     * Thread running on DHT for listening to TCP connections
+     * @param port Port this server runs on
+     * @param directory_map Locations of other servers
+     * @param peerMap Filename -> Peer location
+     * @throws IOException if socket can't be initialized
+     */
     public ListenerThreadTCP(int port, HashMap directory_map, HashMap peerMap) throws IOException {
         this.port = port;
         this.directory_map = directory_map;

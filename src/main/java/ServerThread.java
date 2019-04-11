@@ -37,7 +37,6 @@ public class ServerThread extends Thread {
     public void run() {
 
         try {
-//            out = new PrintWriter(clientSocket.getOutputStream(), true);
             ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             clientMsg = in.readLine();
@@ -48,7 +47,6 @@ public class ServerThread extends Thread {
             }
             if(clientMsg.equals("hello")) {
                 System.out.println("hi");
-//                out.println("hi");
             } else {
                 System.out.println("noo");
             }
@@ -60,9 +58,6 @@ public class ServerThread extends Thread {
                 Set entrySet = file_map.entrySet();
                 for (Map.Entry entry : file_map.entrySet()) {
                     String key = (String) entry.getKey();
-//                    if (entry.getValue() == clientID) {
-//                        file_map.remove(key);
-//                    }
                 }
 
                 //Inform other servers
@@ -72,8 +67,6 @@ public class ServerThread extends Thread {
                     sendMessage(clientMsg);
                     stopConnection();
                 }
-                //Connect to other servers in DHT
-                //Send a message to each DHT server to remove entries by leaving client.
 
 
             }
@@ -86,7 +79,6 @@ public class ServerThread extends Thread {
             clientSocket = new Socket(ip, port);
             str_out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-//            in = new ObjectInputStream(clientSocket.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -110,14 +102,10 @@ public class ServerThread extends Thread {
         try {
 
             response = in.readLine();
-//            response = in.readObject();
             return response;
         } catch(IOException e) {
             e.printStackTrace();
         }
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
 
         throw new IOException("No response from server");
     }

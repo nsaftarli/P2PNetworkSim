@@ -12,6 +12,12 @@ public class ListenerThreadUDP extends Thread {
     HashMap<Integer, Integer> directory_map;
     HashMap<String, Integer> peerMap;
 
+    /**
+     * Thread to handle requests for information on files from peers
+     * @param port Port this DHT server runs on
+     * @param directory_map Locations of other DHT servers
+     * @param peerMap Locations of files
+     */
     public ListenerThreadUDP(int port, HashMap directory_map, HashMap peerMap) {
         this.port = port;
         this.directory_map = directory_map;
@@ -57,7 +63,6 @@ public class ListenerThreadUDP extends Thread {
                     System.out.println(ip);
                     String ipString = Integer.toString(ip);
 
-                    //
                     String clientIP = DpReceive.getAddress().toString().substring(1);
                     System.out.println(clientIP);
 

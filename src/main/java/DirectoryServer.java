@@ -35,13 +35,6 @@ public class DirectoryServer extends Server {
     private static HashMap<String, Integer> peerMap = new HashMap<String, Integer>();
     public static DatagramSocket ds;
 
-
-
-
-    public DirectoryServer(int id) {
-        super(id);
-        buildServerTable();
-    }
     public DirectoryServer(int id, int port) {
         super(id, port);
         printStartupMessage();
@@ -54,19 +47,13 @@ public class DirectoryServer extends Server {
     @Override
     public void stop(){}
 
-    public void insertInHash(String key, int value) {
-        peerMap.put(key, value);
-    }
-
-    public Integer getFromHash(String fileName) {
-        return peerMap.get(fileName);
-    }
 
     public static void main(String[] args) throws IOException {
         int port = Integer.parseInt(args[1]);	       // The server's main port. The client will connect to this port using UDP. The predecessor server will also connect to this port using TCP.
         int serverID = Integer.parseInt(args[0]);	   // The server's ID, which can be a number from 1 to n depending on the number of servers.
 
         DirectoryServer dirServer = new DirectoryServer(serverID, port);
+        // Starts listeners for both TCP and UDP (since they block otherwise)
         new ListenerThreadTCP(port, directory_map, peerMap).start();
         new ListenerThreadUDP(port, directory_map, peerMap).start();
     }

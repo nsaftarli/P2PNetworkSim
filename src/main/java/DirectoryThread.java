@@ -30,7 +30,6 @@ public class DirectoryThread extends Thread {
     public void run() {
 
         try {
-//            out = new PrintWriter(clientSocket.getOutputStream(), true);
             byte [] buffer = new byte[2048];
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
             clientDatagramSocket.receive(packet);
@@ -44,7 +43,6 @@ public class DirectoryThread extends Thread {
             }
             if(clientMsg.equals("hello")) {
                 System.out.println("hi");
-//                out.println("hi");
             } else {
                 System.out.println("noo");
             }

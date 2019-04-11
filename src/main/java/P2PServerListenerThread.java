@@ -9,6 +9,11 @@ public class P2PServerListenerThread extends Thread {
     HashMap<String, File> file_map;
     ServerSocket serverSocket;
 
+    /**
+     * Handles listening for a connection request from peers to other peers in the network
+     * @param port Port this peer's server is hosted on
+     * @param file_map Name of file maps to the file object
+     */
     public P2PServerListenerThread(int port, HashMap file_map) {
         this.port = port;
         this.file_map = file_map;

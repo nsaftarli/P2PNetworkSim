@@ -33,43 +33,8 @@ public class P2PServer extends Server {
     public void stop(){}
 
     public static void main(String[] args) throws IOException {
-//        P2PServer p2pServer = new P2PServer(1);
-
         new P2PServerListenerThread(port, file_map);
-//        try {
-////            ServerSocket p2pServerSocket = new ServerSocket(p2pServer.C1_PORT);
-//            ServerSocket serverSocket = new ServerSocket(C1_PORT);
-//            while (true) {
-//                Socket clientSocket = serverSocket.accept();
-//                new ServerThread(clientSocket).start();
-//
-////                p2pServer.transferFile();
-//            }
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
-    }
-
-    public void transferFile() {
-        int bytesRead;
-        try {
-            InputStream in = clientSocket.getInputStream();
-
-            OutputStream out = new FileOutputStream("../../../resources_out/abc.png");
-
-            byte[] buffer = new byte[2048];
-
-            while ((bytesRead = in.read(buffer)) != -1) {
-                out.write(buffer, 0, bytesRead);
-            }
-            out.close();
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 
