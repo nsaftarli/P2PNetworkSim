@@ -7,7 +7,7 @@ P2PClient and directory server interacts with a unique UDP port from the directo
 P2PClient to P2PServer interacts with a TCP connection.
 
 
-SETUP
+SETUP FOR LOCAL TESTING
 Step 1: Start Intellij on a computer and open the project folder. File -> Open
 Step 2: Navigate to "P2PPhotoAlbum"
 
@@ -47,11 +47,31 @@ SETTING UP Resource Folder file paths
 	On line 255 of the P2PClient.java file, there is an Image.write function call,
 	here update `ImageIO.write(image, "jpg", new File("<with your full file path>/resources_out/" + name));`
 
-
-RUNNING 
-Step 1: Run all four Directory Servers
+RUNNING LOCALLY
+Step 1: Run all four Directory Servers 
 Step 2: Run the P2PClientUpload
 Step 3: Run the P2PClientDownload
+Step 4: In the P2PClientUpload command line, enter U to select Upload.
+Step 5: Enter `<yourFileName>.jpg` in the command line, to upload the test image file.
+Step 6: In the P2PClientDownload command line, enter Q to select Querying for downloading the test file
+Step 7: Enter `<yourFileName>.jpg` in the command line for P2PClientDownload for the download to begin
+Step 8: Wait for the image to load
+
+
+SETTING UP FOR LAB TESTING
+	For lab testing purposes, we were able to run Directory servers on one computer, and Peer Clients on separate servers
+		This was done by changing the value on the `LOCALHOST` constant value within P2PClient.java from `127.0.0.1` to
+		the IPAddress of the machine that runs the Directory Servers.
+
+RUNNING IN THE LAB
+Step 1: Run all four Directory Servers on one machine (This will be the IPAddress that the Peer Clients connect to)
+
+Step 2: Run the P2PClientUpload on a second machine (Change `LOCALHOST` constant value within P2PClient.java from `127.0.0.1` to
+		the IPAddress of the machine that runs the Directory Servers.)
+
+Step 3: Run the P2PClientDownload on a third machine (Change `LOCALHOST` constant value within P2PClient.java from `127.0.0.1` to
+		the IPAddress of the machine that runs the Directory Servers)
+		
 Step 4: In the P2PClientUpload command line, enter U to select Upload.
 Step 5: Enter `<yourFileName>.jpg` in the command line, to upload the test image file.
 Step 6: In the P2PClientDownload command line, enter Q to select Querying for downloading the test file
