@@ -26,7 +26,7 @@ public class P2PClient {
     DatagramSocket ds;
 
     private String ip;
-    private int peerPort;
+    private static int peerPort;
     private Socket clientSocket;
     private PrintWriter out;
 //    private BufferedReader in;
@@ -34,6 +34,7 @@ public class P2PClient {
 
     public static void main(String args[]) throws IOException {
         String userInput;
+        peerPort = Integer.parseInt(args[0]);
         P2PClient p = new P2PClient(); // IP of Directory server ID=1 is 20680
 
         // Displays action information for client that is connecting to Directory Server
@@ -92,7 +93,7 @@ public class P2PClient {
         directoryHashMap.put(1, S1_PORT);
 
         //Change later:
-        peerPort = C1_PORT;
+//        peerPort = C1_PORT;
 
         init();
 
@@ -163,7 +164,7 @@ public class P2PClient {
 //        String serverIP = Integer.toString(serverID);
         int serverPort = directoryHashMap.get(serverID);
 
-        String msg = "Upload " + name;
+        String msg = "Upload " + name + " " + this.peerPort;
 
         // Contact directory server with serverID to store record (content name, client IP)
         sendDataToDS(msg, serverPort);
@@ -193,10 +194,15 @@ public class P2PClient {
         String statusCode = scan.next();
         if (Integer.parseInt(statusCode) == 200) {
             // Read in destination port
+            int peerServerPort = Integer.parseInt(scan.next());
 
             // Generate HTTP header object
+            String http_header = "GET " + name;
 
             // Send request to destination port (P2PServer)
+            startConnection(LOCALHOST, peerServerPort);
+            Object resp = sendMessage(http_header);
+
 
             // Receive file
 
@@ -259,6 +265,7 @@ public class P2PClient {
 
     public void exit() throws Exception {
         byte[] receiveData = new byte[1024];
+
 //        String statusCode; // HTTP status code.
 //        String message = "EXIT " + serverPortNumbers[0] + " " + serverPortNumbers[1] + " " + serverPortNumbers[2] + " " + serverPortNumbers[3] + " Padding";
 //        sendDataToServer(message, serverIPs[0], serverPortNumbers[0]); // Send message exit to server.

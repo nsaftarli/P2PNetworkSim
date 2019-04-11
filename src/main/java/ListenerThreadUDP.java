@@ -42,8 +42,9 @@ public class ListenerThreadUDP extends Thread {
                     sc.next();
                     String fileName = sc.next().trim();
                     System.out.println(fileName);
+                    int srcPort = Integer.parseInt(sc.next().trim());
 
-                    insertInHash(fileName, port); // Inserts record into hash map
+                    insertInHash(fileName, srcPort); // Inserts record into hash map
                     int val = getFromHash(fileName);
                     System.out.println(val);
                 } else if (msg.length() > 0 && msg.contains("Query")){
