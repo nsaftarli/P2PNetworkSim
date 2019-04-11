@@ -1,13 +1,6 @@
 import java.io.*;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.Charset;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Scanner;
+import java.util.HashMap;
 
 /**
  * This is a server running on one of the peers in the network.
@@ -20,13 +13,18 @@ public class P2PServer extends Server {
     final int statusCode505 = 505; // HTTP Version Not Supported
     private final int S1_PORT = 20680;
     private static final int C1_PORT = 20684;
+    private static HashMap<String, File> file_map;
+    private static int port;
+
     Socket serverSocket;
 
     public P2PServer(){
         super();
     }
-    public P2PServer(int id) {
-        super(id);
+    public P2PServer(int port, HashMap file_map) {
+//        super(port);
+        this.port = port;
+        this.file_map = file_map;
     }
 
     private Thread thread = null;
@@ -35,21 +33,22 @@ public class P2PServer extends Server {
     public void stop(){}
 
     public static void main(String[] args) throws IOException {
-        P2PServer p2pServer = new P2PServer(1);
+//        P2PServer p2pServer = new P2PServer(1);
 
-        try {
-//            ServerSocket p2pServerSocket = new ServerSocket(p2pServer.C1_PORT);
-            ServerSocket serverSocket = new ServerSocket(C1_PORT);
-            while (true) {
-                Socket clientSocket = serverSocket.accept();
-                new ServerThread(clientSocket).start();
-
-//                p2pServer.transferFile();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        new P2PServerListenerThread(port, file_map);
+//        try {
+////            ServerSocket p2pServerSocket = new ServerSocket(p2pServer.C1_PORT);
+//            ServerSocket serverSocket = new ServerSocket(C1_PORT);
+//            while (true) {
+//                Socket clientSocket = serverSocket.accept();
+//                new ServerThread(clientSocket).start();
+//
+////                p2pServer.transferFile();
+//            }
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
     }
 

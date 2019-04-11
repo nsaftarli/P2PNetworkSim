@@ -3,12 +3,14 @@ import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class ListenerThreadTCP extends Thread {
     ServerSocket serverSocket;
     int port;
     HashMap<Integer, Integer> directory_map;
     HashMap<String, Integer> peerMap;
+    Scanner scanner;
 
     public ListenerThreadTCP(int port, HashMap directory_map, HashMap peerMap) throws IOException {
         this.port = port;

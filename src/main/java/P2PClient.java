@@ -1,9 +1,11 @@
 //import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.*;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.IOException;
@@ -22,6 +24,7 @@ public class P2PClient {
     private HashMap<Integer, Integer> directoryHashMap;
     // Content -> (Server ID, Server IP)
     private HashMap<String, Record> recordHashMap;
+    private static HashMap<String, File> fileHashMap;
     private ArrayList files;
     DatagramSocket ds;
 
@@ -29,14 +32,15 @@ public class P2PClient {
     private static int peerPort;
     private Socket clientSocket;
     private PrintWriter out;
-//    private BufferedReader in;
+    private BufferedReader str_in;
     private ObjectInputStream in;
 
     public static void main(String args[]) throws IOException {
         String userInput;
         peerPort = Integer.parseInt(args[0]);
         P2PClient p = new P2PClient(); // IP of Directory server ID=1 is 20680
-
+//        P2PServer p2PServer = new P2PServer(peerPort, fileHashMap);
+        new P2PServerListenerThread(peerPort, fileHashMap).start();
         // Displays action information for client that is connecting to Directory Server
         while (true) {
             Scanner scan = new Scanner(System.in);
@@ -89,6 +93,7 @@ public class P2PClient {
 //        this.fileString = fileString;
 //        this.ip = this.LOCALHOST;
         recordHashMap = new HashMap<String, Record>();
+        fileHashMap = new HashMap<String, File>();
         directoryHashMap = new HashMap<Integer, Integer>();
         directoryHashMap.put(1, S1_PORT);
 
@@ -127,6 +132,16 @@ public class P2PClient {
             e.printStackTrace();
         }
     }
+
+    public void startPeerConnection(String ip, int port) {
+        try {
+            clientSocket = new Socket(ip, port);
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
+            str_in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public void stopConnection() throws IOException {
         try {
             in.close();
@@ -156,8 +171,25 @@ public class P2PClient {
         throw new IOException("No response from server");
     }
 
+    public String sendPeerMessage(String msg) throws IOException {
+        String response;
+
+        out.println(msg);
+        try {
+            response = str_in.readLine();
+            return response;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        throw new IOException("No response from server");
+    }
+
 
     public void storeRecord(String name) {
+        // Read file
+        addFile(name);
+
+        // Hash to a server based on file name
         int serverID = MiscFunctions.hashFunction(name);
         int UDPPort = peerPort;
         // Should be server port
@@ -200,11 +232,36 @@ public class P2PClient {
             String http_header = "GET " + name;
 
             // Send request to destination port (P2PServer)
-            startConnection(LOCALHOST, peerServerPort);
-            Object resp = sendMessage(http_header);
+            startPeerConnection(LOCALHOST, peerServerPort);
+            String resp = sendPeerMessage(http_header);
+            System.out.println(resp);
+            InputStream inputStream = clientSocket.getInputStream();
 
-
+            byte[] size_arr = new byte[4];
+            inputStream.read(size_arr);
+//            int size = ByteBuffer.wra
             // Receive file
+//            InputStream inputStream = clientSocket.getInputStream();
+//            OutputStream outputStream = new FileOutputStream("/Users/Nariman/Documents/School/CPS706/ClientServer/resources_out/" + name);
+//
+//            byte[] buffer = new byte[2048];
+//            int bytesRead;
+//            while ((bytesRead = inputStream.read(buffer)) != -1) {
+//                outputStream.write(buffer, 0, bytesRead);
+//            }
+//            outputStream.wr
+//            out.close();
+
+            InputStream inputStream = clientSocket.getInputStream();
+            byte[] img_size = new byte[4];
+
+            inputStream.read(img_size);
+            int size = ByteBuffer.wrap(img_size).asIntBuffer().get();
+
+            byte[] img_arr = new byte[size];
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(img_arr));
+
+            ImageIO.write(image, "png", new File("/Users/Nariman/Documents/School/CPS706/ClientServer/resources_out/"))
 
         }
 
@@ -263,6 +320,15 @@ public class P2PClient {
         return msg;
     }
 
+    public void addFile(String name) {
+        String path = "/Users/Nariman/Documents/School/CPS706/ClientServer/resources_in/";
+        File file = new File(path + name);
+        fileHashMap.put(name, file);
+    }
+
+    public File getFile(String name) {
+        return fileHashMap.get(name);
+    }
     public void exit() throws Exception {
         byte[] receiveData = new byte[1024];
 
